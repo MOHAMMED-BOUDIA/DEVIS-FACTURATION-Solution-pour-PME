@@ -1,0 +1,507 @@
+import React, { useState, useEffect } from 'react';
+import { 
+  Building2, 
+  MapPin, 
+  Phone, 
+  Mail, 
+  Globe, 
+  Settings as SettingsIcon,
+  CreditCard,
+  Percent,
+  Hash,
+  Save,
+  CheckCircle2,
+  AlertCircle,
+  Lock,
+  User,
+  ShieldCheck,
+  Eye,
+  EyeOff,
+  Bell,
+  HardDrive
+} from 'lucide-react';
+import { 
+  Box, 
+  Tabs, 
+  Tab, 
+  Typography, 
+  Paper, 
+  Divider,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  Button,
+  CircularProgress,
+  Switch,
+  FormControlLabel
+} from '@mui/material';
+import api from '../api/client';
+import useAuthStore from '../store/authStore';
+
+// TabPanel Helper
+function TabPanel(props) {
+  const { children, value, index, ...other } = props;
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      {...other}
+      className="animate-in fade-in slide-in-from-bottom-2 duration-500"
+    >
+      {value === index && (
+        <Box sx={{ pt: 4 }}>
+          {children}
+        </Box>
+      )}
+    </div>
+  );
+}
+
+const Settings = () => {
+  const { user: authUser } = useAuthStore();
+  const [activeTab, setActiveTab] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState({ type: '', text: '' });
+  const [showPassword, setShowPassword] = useState(false);
+  
+  // Unsaved changes protection
+  const [hasChanges, setHasChanges] = useState(false);
+  const [pendingTab, setPendingTab] = useState(null);
+  const [openConfirm, setOpenConfirm] = useState(false);
+
+  // Form States
+  const [adminForm, setAdminForm] = useState({
+    name: authUser?.name || '',
+    email: authUser?.email || '',
+    newPassword: '',
+    confirmPassword: '',
+    twoFactor: false
+  });
+
+  const [companyForm, setCompanyForm] = useState({
+    name: 'Ma Entreprise SARL',
+    address: 'Casablanca, Maroc',
+    taxId: '00123456789',
+    phone: '+212 5XX XX XX XX',
+    email: 'billing@entreprise.ma',
+    settings: {
+      currency: 'DH',
+      defaultVat: 20,
+      quotePrefix: 'DEVIS-',
+      invoicePrefix: 'FACT-'
+    }
+  });
+
+  const handleTabChange = (event, newValue) => {
+    if (hasChanges) {
+      setPendingTab(newValue);
+      setOpenConfirm(true);
+    } else {
+      setActiveTab(newValue);
+      setMessage({ type: '', text: '' });
+    }
+  };
+
+  const confirmTabChange = () => {
+    setActiveTab(pendingTab);
+    setHasChanges(false);
+    setOpenConfirm(false);
+    setMessage({ type: '', text: '' });
+  };
+
+  const handleAdminUpdate = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      // Simulate API call: PUT /api/auth/profile
+      await new Promise(r => setTimeout(r, 1000));
+      setMessage({ type: 'success', text: 'Profil administrateur mis à jour !' });
+      setHasChanges(false);
+    } catch (err) {
+      setMessage({ type: 'error', text: 'Erreur lors de la mise à jour.' });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleCompanyUpdate = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      // Simulate API call: PUT /api/company/settings
+      await new Promise(r => setTimeout(r, 1000));
+      setMessage({ type: 'success', text: 'Paramètres entreprise enregistrés !' });
+      setHasChanges(false);
+    } catch (err) {
+      setMessage({ type: 'error', text: 'Erreur technique rencontrée.' });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (authUser?.role !== 'admin') {
+    return (
+      <div className="flex flex-col items-center justify-center p-20 text-center space-y-4">
+        <div className="w-20 h-20 bg-rose-50 rounded-full flex items-center justify-center text-rose-500">
+           <AlertCircle size={40} />
+        </div>
+        <h1 className="text-2xl font-black text-slate-900">Accès Refusé</h1>
+        <p className="text-slate-500 max-w-sm font-medium">Seul l'administrateur système peut accéder aux réglages critiques de l'application.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-6xl mx-auto pb-24">
+      <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div>
+          <h2 className="text-4xl font-black text-slate-900 tracking-tighter">Paramètres</h2>
+          <p className="text-slate-500 font-bold mt-2">Gérez la sécurité de votre compte et les données de votre entreprise.</p>
+        </div>
+        
+        {message.text && (
+          <div className={`px-6 py-3 rounded-2xl flex items-center space-x-3 text-sm font-black uppercase tracking-widest animate-in fade-in slide-in-from-right-4 ${
+            message.type === 'success' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'
+          }`}>
+            {message.type === 'success' ? <CheckCircle2 size={18} /> : <AlertCircle size={18} />}
+            <span>{message.text}</span>
+          </div>
+        )}
+      </div>
+
+      <Box sx={{ width: '100%' }}>
+        <div className="bg-white/50 backdrop-blur-sm p-1 rounded-[2.5rem] border border-slate-100 inline-flex mb-8 shadow-sm">
+          <Tabs 
+            value={activeTab} 
+            onChange={handleTabChange}
+            variant="standard"
+            sx={{
+              '& .MuiTabs-indicator': { display: 'none' },
+              '& .MuiTab-root': {
+                minHeight: 56,
+                minWidth: 200,
+                borderRadius: '2rem',
+                fontSize: '0.75rem',
+                fontWeight: 900,
+                textTransform: 'uppercase',
+                letterSpacing: '0.15em',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                color: '#64748b',
+                '&.Mui-selected': {
+                  color: '#fff',
+                  backgroundColor: '#0f172a',
+                  boxShadow: '0 10px 25px -5px rgba(15, 23, 42, 0.2)'
+                },
+                '&:hover:not(.Mui-selected)': {
+                  backgroundColor: '#f8fafc'
+                }
+              }
+            }}
+          >
+            <Tab icon={<ShieldCheck size={18} className="mr-2" />} iconPosition="start" label="Sécurité Admin" />
+            <Tab icon={<Building2 size={18} className="mr-2" />} iconPosition="start" label="Général & Facturation" />
+          </Tabs>
+        </div>
+
+        {/* ADMIN TAB */}
+        <TabPanel value={activeTab} index={0}>
+          <form onSubmit={handleAdminUpdate} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2 space-y-8">
+              <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
+                <div className="p-10 space-y-10">
+                  <div className="flex items-center space-x-6">
+                    <div className="w-20 h-20 bg-brand-50 rounded-[2rem] flex items-center justify-center text-brand-600 border border-brand-100 shadow-inner">
+                      <User size={32} className="stroke-[2.5px]" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-black text-slate-900">Information Personnelle</h3>
+                      <p className="text-xs font-bold text-slate-400 mt-1 uppercase tracking-widest">Identité officielle du compte</p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="space-y-3">
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Nom complet</label>
+                      <input 
+                        className="w-full bg-slate-50 border-none rounded-2xl px-6 py-4 text-slate-900 font-bold focus:ring-2 focus:ring-brand-500/20 transition-all outline-none" 
+                        value={adminForm.name}
+                        onChange={e => { setAdminForm({...adminForm, name: e.target.value}); setHasChanges(true); }}
+                      />
+                    </div>
+                    <div className="space-y-3">
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Email Administrateur</label>
+                      <input 
+                        className="w-full bg-slate-50 border-none rounded-2xl px-6 py-4 text-slate-900 font-bold focus:ring-2 focus:ring-brand-500/20 transition-all outline-none" 
+                        value={adminForm.email}
+                        onChange={e => { setAdminForm({...adminForm, email: e.target.value}); setHasChanges(true); }}
+                      />
+                    </div>
+                  </div>
+
+                  <Divider />
+
+                  <div className="space-y-8">
+                    <div className="flex items-center space-x-4 text-amber-600">
+                       <Lock size={20} className="stroke-[2.5px]" />
+                       <h4 className="text-sm font-black uppercase tracking-[0.2em]">Sécurité du compte</h4>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                      <div className="space-y-3">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Nouveau mot de passe</label>
+                        <div className="relative">
+                          <input 
+                            type={showPassword ? "text" : "password"}
+                            className="w-full bg-slate-50 border-none rounded-2xl px-6 py-4 text-slate-900 font-bold focus:ring-2 focus:ring-brand-500/20 transition-all outline-none pr-14" 
+                            placeholder="Laisser vide pour ne pas changer"
+                            value={adminForm.newPassword}
+                            onChange={e => { setAdminForm({...adminForm, newPassword: e.target.value}); setHasChanges(true); }}
+                          />
+                          <button 
+                            type="button" 
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-5 top-4 text-slate-300 hover:text-slate-600"
+                          >
+                            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                          </button>
+                        </div>
+                      </div>
+                      <div className="space-y-3">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Confirmer mot de passe</label>
+                        <input 
+                          type="password"
+                          className="w-full bg-slate-50 border-none rounded-2xl px-6 py-4 text-slate-900 font-bold focus:ring-2 focus:ring-brand-500/20 transition-all outline-none" 
+                          value={adminForm.confirmPassword}
+                          onChange={e => { setAdminForm({...adminForm, confirmPassword: e.target.value}); setHasChanges(true); }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="px-10 py-6 bg-slate-50 flex items-center justify-between border-t border-slate-100">
+                  <p className="text-[10px] font-bold text-slate-400 max-w-xs italic uppercase tracking-widest">
+                    Dernière modification : {new Date().toLocaleDateString()}
+                  </p>
+                  <button 
+                    disabled={!hasChanges || saving}
+                    className="bg-brand-600 hover:bg-brand-700 disabled:bg-slate-200 disabled:text-slate-400 text-white font-black px-12 py-4 rounded-2xl transition-all shadow-xl shadow-brand-200 disabled:shadow-none uppercase tracking-widest text-[10px] flex items-center"
+                  >
+                    {saving && <CircularProgress size={16} color="inherit" className="mr-3" />}
+                    Mettre à jour le profil
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-8">
+              <div className="bg-slate-900 text-white rounded-[2.5rem] p-10 space-y-6 shadow-2xl shadow-slate-200 overflow-hidden relative group">
+                <div className="absolute -right-10 -bottom-10 opacity-5 group-hover:scale-110 transition-transform duration-700">
+                   <ShieldCheck size={200} />
+                </div>
+                <h4 className="text-lg font-black tracking-tight relative">Statut de Sécurité</h4>
+                <div className="space-y-4 relative">
+                  <div className="p-4 bg-white/5 rounded-2xl border border-white/10 flex items-center justify-between">
+                    <span className="text-xs font-bold text-white/50 uppercase tracking-widest">Double Facteur</span>
+                    <Switch 
+                      checked={adminForm.twoFactor} 
+                      onChange={e => { setAdminForm({...adminForm, twoFactor: e.target.checked}); setHasChanges(true); }}
+                      color="primary"
+                    />
+                  </div>
+                  <div className="p-4 bg-white/5 rounded-2xl border border-white/10 flex items-center space-x-3">
+                    <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
+                    <span className="text-xs font-black uppercase tracking-widest text-emerald-400">Certifié PKI-Ready</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-[2rem] border border-slate-100 p-8 space-y-4">
+                 <div className="flex items-center space-x-3 text-slate-400 mb-2">
+                    <HardDrive size={18} />
+                    <span className="text-[10px] font-black uppercase tracking-widest">Stockage & Cloud</span>
+                 </div>
+                 <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                    <div className="h-full bg-brand-500 w-[65%]" />
+                 </div>
+                 <p className="text-[10px] font-bold text-slate-500">
+                   Utilisation : <span className="text-slate-900">422MB / 1GB</span>
+                 </p>
+              </div>
+            </div>
+          </form>
+        </TabPanel>
+
+        {/* COMPANY TAB */}
+        <TabPanel value={activeTab} index={1}>
+          <form onSubmit={handleCompanyUpdate} className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+            <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
+               <div className="p-10 space-y-8">
+                 <div className="flex items-center space-x-4 mb-4">
+                    <div className="w-12 h-12 bg-slate-900 text-white rounded-2xl flex items-center justify-center">
+                       <Building2 size={24} />
+                    </div>
+                    <div>
+                       <h3 className="text-xl font-black text-slate-900">Identité Entreprise</h3>
+                       <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Données légales par défaut</p>
+                    </div>
+                 </div>
+
+                 <div className="space-y-6">
+                    <div className="space-y-3">
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Raison Sociale</label>
+                      <input 
+                        className="w-full bg-slate-50 border-none rounded-2xl px-6 py-4 text-slate-900 font-bold focus:ring-2 focus:ring-brand-500/20 transition-all outline-none" 
+                        value={companyForm.name}
+                        onChange={e => { setCompanyForm({...companyForm, name: e.target.value}); setHasChanges(true); }}
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-6">
+                      <div className="space-y-3">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Email Facturation</label>
+                        <input 
+                          type="email"
+                          className="w-full bg-slate-50 border-none rounded-2xl px-6 py-4 text-slate-900 font-bold focus:ring-2 focus:ring-brand-500/20 transition-all outline-none" 
+                          value={companyForm.email}
+                          onChange={e => { setCompanyForm({...companyForm, email: e.target.value}); setHasChanges(true); }}
+                        />
+                      </div>
+                      <div className="space-y-3">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Téléphone</label>
+                        <input 
+                          className="w-full bg-slate-50 border-none rounded-2xl px-6 py-4 text-slate-900 font-bold focus:ring-2 focus:ring-brand-500/20 transition-all outline-none" 
+                          value={companyForm.phone}
+                          onChange={e => { setCompanyForm({...companyForm, phone: e.target.value}); setHasChanges(true); }}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">ICE (Identifiant Commun)</label>
+                      <input 
+                        className="w-full bg-slate-50 border-none rounded-2xl px-6 py-4 text-slate-900 font-black focus:ring-2 focus:ring-brand-500/20 transition-all outline-none" 
+                        value={companyForm.taxId}
+                        onChange={e => { setCompanyForm({...companyForm, taxId: e.target.value}); setHasChanges(true); }}
+                      />
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Adresse Siège Social</label>
+                      <textarea 
+                        className="w-full bg-slate-50 border-none rounded-[2rem] px-6 py-4 text-slate-900 font-medium focus:ring-2 focus:ring-brand-500/20 transition-all outline-none resize-none min-h-[100px]" 
+                        value={companyForm.address}
+                        onChange={e => { setCompanyForm({...companyForm, address: e.target.value}); setHasChanges(true); }}
+                      />
+                    </div>
+                 </div>
+               </div>
+            </div>
+
+            <div className="space-y-10">
+               <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
+                  <div className="p-10 space-y-8">
+                    <div className="flex items-center space-x-4 mb-4">
+                        <div className="w-12 h-12 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center border border-amber-100">
+                          <SettingsIcon size={24} />
+                        </div>
+                        <div>
+                          <h3 className="text-xl font-black text-slate-900">Séquences & Taxes</h3>
+                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Paramétrage technique</p>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-6">
+                      <div className="space-y-3">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Devise</label>
+                        <input 
+                          className="w-full bg-slate-50 border-none rounded-2xl px-6 py-4 text-slate-900 font-black focus:ring-2 focus:ring-brand-500/20 transition-all outline-none" 
+                          value={companyForm.settings.currency}
+                          onChange={e => { setCompanyForm({...companyForm, settings: {...companyForm.settings, currency: e.target.value}}); setHasChanges(true); }}
+                        />
+                      </div>
+                      <div className="space-y-3">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">TVA (%)</label>
+                        <input 
+                          type="number"
+                          className="w-full bg-slate-50 border-none rounded-2xl px-6 py-4 text-slate-900 font-black focus:ring-2 focus:ring-brand-500/20 transition-all outline-none" 
+                          value={companyForm.settings.defaultVat}
+                          onChange={e => { setCompanyForm({...companyForm, settings: {...companyForm.settings, defaultVat: Number(e.target.value)}}); setHasChanges(true); }}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-6">
+                      <div className="space-y-3">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Préfixe Devis</label>
+                        <input 
+                          className="w-full bg-slate-50 border-none rounded-2xl px-6 py-4 text-slate-900 font-bold focus:ring-2 focus:ring-brand-500/20 transition-all outline-none" 
+                          value={companyForm.settings.quotePrefix}
+                          onChange={e => { setCompanyForm({...companyForm, settings: {...companyForm.settings, quotePrefix: e.target.value}}); setHasChanges(true); }}
+                        />
+                      </div>
+                      <div className="space-y-3">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Préfixe Facture</label>
+                        <input 
+                          className="w-full bg-slate-50 border-none rounded-2xl px-6 py-4 text-slate-900 font-bold focus:ring-2 focus:ring-brand-500/20 transition-all outline-none" 
+                          value={companyForm.settings.invoicePrefix}
+                          onChange={e => { setCompanyForm({...companyForm, settings: {...companyForm.settings, invoicePrefix: e.target.value}}); setHasChanges(true); }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-10 bg-slate-50 border-t border-slate-100 flex items-center justify-end">
+                    <button 
+                      disabled={!hasChanges || saving}
+                      className="bg-slate-900 hover:bg-black disabled:bg-slate-200 disabled:text-slate-400 text-white font-black px-12 py-4 rounded-2xl transition-all shadow-xl shadow-slate-200 disabled:shadow-none uppercase tracking-widest text-[10px] flex items-center"
+                    >
+                      {saving && <CircularProgress size={16} color="inherit" className="mr-3" />}
+                      Sauvegarder l'entreprise
+                    </button>
+                  </div>
+               </div>
+            </div>
+          </form>
+        </TabPanel>
+      </Box>
+
+      {/* Confirmation Dialog */}
+      <Dialog 
+        open={openConfirm} 
+        onClose={() => setOpenConfirm(false)}
+        PaperProps={{
+          sx: { borderRadius: '2rem', p: 2 }
+        }}
+      >
+        <DialogTitle className="text-xl font-black text-slate-900">Modifications non enregistrées</DialogTitle>
+        <DialogContent>
+          <DialogContentText className="font-medium text-slate-500">
+            Vous avez des modifications en cours. Si vous changez de section sans enregistrer, vos changements seront perdus.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 3 }}>
+          <Button 
+            onClick={() => setOpenConfirm(false)} 
+            sx={{ borderRadius: '1rem', px: 3, fontWeight: 900, color: '#64748b' }}
+          >
+            Annuler
+          </Button>
+          <Button 
+            onClick={confirmTabChange} 
+            variant="contained" 
+            color="error"
+            sx={{ borderRadius: '1rem', px: 4, fontWeight: 900, boxShadow: 'none' }}
+          >
+            Quitter sans sauver
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </div>
+  );
+};
+
+export default Settings;

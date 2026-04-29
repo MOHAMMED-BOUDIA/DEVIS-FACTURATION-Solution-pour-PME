@@ -1,0 +1,149 @@
+@import "tailwindcss";
+
+:root {
+  --pf-primary: #275df6;
+  --pf-primary-bg: #edf2ff;
+  --pf-secondary: #0f766e;
+  --pf-success: #15803d;
+  --pf-success-bg: #eaf9ee;
+  --pf-warning: #b45309;
+  --pf-warning-bg: #fff7ed;
+  --pf-danger: #b91c1c;
+  --pf-danger-bg: #fef2f2;
+  --pf-neutral-50: #f8fafc;
+  --pf-neutral-100: #f1f5f9;
+  --pf-neutral-200: #e2e8f0;
+  --pf-neutral-500: #64748b;
+  --pf-neutral-700: #334155;
+  --pf-neutral-900: #0f172a;
+  --pf-bg: #f6f8fc;
+  --pf-border: #e2e8f0;
+  --pf-radius-sm: 10px;
+  --pf-radius-md: 14px;
+  --pf-radius-lg: 20px;
+  --pf-shadow-sm: 0 4px 14px rgba(15, 23, 42, 0.05);
+  --pf-shadow-md: 0 16px 30px rgba(15, 23, 42, 0.12);
+}
+
+@theme {
+  --color-brand-50: #edf2ff;
+  --color-brand-100: #dbe5ff;
+  --color-brand-200: #bdd1ff;
+  --color-brand-300: #94b2ff;
+  --color-brand-400: #5f8fff;
+  --color-brand-500: #275df6;
+  --color-brand-600: #204ad2;
+  --color-brand-700: #1d3cab;
+  --color-brand-800: #1f3589;
+  --color-brand-900: #1f316f;
+  --font-sans: "Manrope", "Inter", system-ui, sans-serif;
+  --font-display: "Manrope", "Inter", system-ui, sans-serif;
+}
+
+@layer base {
+  body {
+    @apply text-slate-900 selection:bg-brand-100 selection:text-brand-900 antialiased;
+    background: var(--pf-bg);
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display tracking-tight font-bold;
+  }
+}
+
+/* Custom Utilities for Components in v4 */
+@utility btn-base {
+  @apply inline-flex items-center justify-center rounded-xl font-bold transition-all duration-200 active:scale-[0.97] disabled:opacity-50 disabled:pointer-events-none;
+}
+
+@layer components {
+  .btn-primary {
+    @apply btn-base text-white;
+    background: var(--pf-primary);
+    box-shadow: var(--pf-shadow-sm);
+  }
+  
+  .btn-secondary {
+    @apply btn-base bg-white text-slate-700 hover:bg-slate-50;
+    border: 1px solid var(--pf-border);
+  }
+
+  .btn-ghost {
+    @apply btn-base text-slate-600 hover:bg-slate-100;
+  }
+
+  .card-premium {
+    @apply bg-white transition-shadow duration-300;
+    border: 1px solid var(--pf-border);
+    border-radius: var(--pf-radius-lg);
+    box-shadow: var(--pf-shadow-sm);
+  }
+
+  .input-modern {
+    @apply block w-full px-4 py-3 bg-white rounded-xl transition-all duration-200 
+           placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 sm:text-sm;
+    border: 1px solid var(--pf-border);
+    border-radius: var(--pf-radius-md);
+  }
+
+  .label-modern {
+    @apply block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1;
+  }
+
+  .badge-modern {
+    @apply px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider flex items-center w-fit;
+  }
+}
+
+/* Animations */
+.animate-in-up {
+  animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Settings page: clean SaaS typography system */
+.settings-clean {
+  font-family: "Manrope", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+.settings-clean h1,
+.settings-clean h2,
+.settings-clean h3,
+.settings-clean h4,
+.settings-clean h5,
+.settings-clean h6 {
+  font-family: "Manrope", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-style: normal;
+  letter-spacing: -0.015em;
+}
+
+.settings-clean .font-black {
+  font-weight: 700 !important;
+}
+
+.settings-clean .settings-title {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  font-style: normal;
+}
+
+.settings-clean .settings-subtitle {
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #64748b;
+}
