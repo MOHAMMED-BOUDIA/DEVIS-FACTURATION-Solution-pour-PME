@@ -322,7 +322,7 @@ const InvoiceForm = () => {
                 <div className="space-y-3">
                   <label className="ml-1 text-[10px] font-black uppercase tracking-widest text-slate-400">Notes (visibles sur la facture)</label>
                   <textarea
-                    className="min-h-[150px] w-full resize-none rounded-[2rem] border-none bg-slate-50 px-8 py-6 text-sm font-medium text-slate-900 shadow-inner outline-none transition focus:ring-2 focus:ring-brand-500/10"
+                    className="mimin-h-[80px] w-full resize-none rounded-[1rem] border-none bg-slate-50 px-6 py-3 text-sm font-medium text-slate-900 shadow-inner outline-none transition focus:ring-2 focus:ring-brand-500/10n-h-[150px] w-full resize-none rounded-[2rem] border-none bg-slate-50 px-8 py-6 text-sm font-medium text-slate-900 shadow-inner outline-none transition focus:ring-2 focus:ring-brand-500/10"
                     placeholder="Informations complémentaires..."
                     value={formData.notes}
                     onChange={(event) => setFormData({ ...formData, notes: event.target.value })}
@@ -332,7 +332,7 @@ const InvoiceForm = () => {
                 <div className="space-y-3">
                   <label className="ml-1 text-[10px] font-black uppercase tracking-widest text-slate-400">Conditions & Coordonnées bancaires</label>
                   <textarea
-                    className="min-h-[150px] w-full resize-none rounded-[2rem] border-none bg-slate-50 px-8 py-6 text-sm font-medium text-slate-900 shadow-inner outline-none transition focus:ring-2 focus:ring-brand-500/10"
+                    className="minmin-h-[80px] w-full resize-none rounded-[1rem] border-none bg-slate-50 px-6 py-3 text-sm font-medium text-slate-900 shadow-inner outline-none transition focus:ring-2 focus:ring-brand-500/10-h-[150px] w-full resize-none rounded-[2rem] border-none bg-slate-50 px-8 py-6 text-sm font-medium text-slate-900 shadow-inner outline-none transition focus:ring-2 focus:ring-brand-500/10"
                     value={formData.terms}
                     onChange={(event) => setFormData({ ...formData, terms: event.target.value })}
                   />

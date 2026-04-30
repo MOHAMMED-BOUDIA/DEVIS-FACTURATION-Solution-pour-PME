@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CreditCard, Download, Plus, Receipt } from 'lucide-react';
-import { Badge, Button, Card, EmptyState, Table, TableCell, TableRow, TableSkeleton } from '../components/UI';
+import { Badge, Button, Card, EmptyState, SearchableSelect, Table, TableCell, TableRow, TableSkeleton } from '../components/UI';
 import api from '../api/client';
 import Modal from '../components/Modal';
 import { useToast } from '../components/ToastProvider';
@@ -92,6 +92,23 @@ export default function Invoices() {
     return names;
   }, [invoices]);
 
+  const statusItems = useMemo(
+    () => [
+      { id: 'all', name: 'Tous les statuts' },
+      { id: 'draft', name: 'Brouillon' },
+      { id: 'sent', name: 'Envoyee' },
+      { id: 'unpaid', name: 'Impayee' },
+      { id: 'paid', name: 'Payee' },
+      { id: 'overdue', name: 'En retard' },
+    ],
+    []
+  );
+
+  const clientItems = useMemo(
+    () => [{ id: 'all', name: 'Tous les clients' }, ...clientOptions.map((name) => ({ id: name, name }))],
+    [clientOptions]
+  );
+
   const filteredInvoices = useMemo(() => {
     return invoices.filter((invoice) => {
       const byStatus = statusFilter === 'all' || invoice.status === statusFilter;
@@ -114,20 +131,38 @@ export default function Invoices() {
 
       <Card>
         <div className="mb-4 flex flex-wrap gap-2">
-          <select className="input-modern w-auto" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
-            <option value="all">Tous les statuts</option>
-            <option value="draft">Brouillon</option>
-            <option value="sent">Envoyee</option>
-            <option value="unpaid">Impayee</option>
-            <option value="paid">Payee</option>
-            <option value="overdue">En retard</option>
-          </select>
-          <select className="input-modern w-auto" value={clientFilter} onChange={(e) => setClientFilter(e.target.value)}>
-            <option value="all">Tous les clients</option>
-            {clientOptions.map((name) => (
-              <option key={name} value={name}>{name}</option>
-            ))}
-          </select>
+          <SearchableSelect
+            items={statusItems}
+            value={statusFilter}
+            onChange={(item) => setStatusFilter(item?.id || 'all')}
+            placeholder="Tous les statuts"
+            searchPlaceholder="Rechercher un statut..."
+            noResultsText="Aucun statut trouve."
+            wrapperClassName="w-64"
+            getKey={(item) => item?.id}
+            getLabel={(item) => item?.name || ''}
+            getSearchText={(item) => item?.name || ''}
+            renderSelectedBadge={(item) =>
+              item?.id && item.id !== 'all' ? (
+                <span className="ml-2 inline-flex items-center rounded-full bg-[var(--pf-primary-bg)] px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-[var(--pf-primary)]">
+                  {item.id}
+                </span>
+              ) : null
+            }
+          />
+
+          <SearchableSelect
+            items={clientItems}
+            value={clientFilter}
+            onChange={(item) => setClientFilter(item?.id || 'all')}
+            placeholder="Tous les clients"
+            searchPlaceholder="Rechercher un client..."
+            noResultsText="Aucun client trouve."
+            wrapperClassName="w-72"
+            getKey={(item) => item?.id}
+            getLabel={(item) => item?.name || ''}
+            getSearchText={(item) => item?.name || ''}
+          />
         </div>
 
         {invoices.length === 0 && !loading ? (
