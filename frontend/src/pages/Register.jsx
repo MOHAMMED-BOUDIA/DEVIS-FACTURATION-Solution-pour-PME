@@ -42,14 +42,14 @@ const Register = () => {
     const result = await signup(data.name, data.email, data.password, data.companyName, data.companyTaxId);
 
     if (result.success) {
-      navigate('/dashboard');
+      navigate('/dashboard', { replace: true });
     } else {
       const errorMessage = result.error?.message || 'Une erreur est survenue';
 
       if (errorMessage.toLowerCase().includes('email')) {
         setError('email', { type: 'manual', message: 'Cet email est deja utilise' });
       } else {
-        setError('root.serverError', { message: errorMessage });
+        setError('root', { type: 'server', message: errorMessage });
       }
     }
   };
@@ -73,9 +73,9 @@ const Register = () => {
           </p>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            {errors.root?.serverError && (
+            {errors.root?.message && (
               <div className="p-4 bg-red-50 border border-red-100 text-red-600 rounded-xl text-sm font-bold animate-shake">
-                {errors.root.serverError.message}
+                {errors.root.message}
               </div>
             )}
 
