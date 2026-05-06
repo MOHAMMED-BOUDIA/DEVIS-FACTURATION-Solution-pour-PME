@@ -60,7 +60,7 @@ const Register = () => {
       <div className="flex-1 flex flex-col justify-center px-8 md:px-20 lg:px-32 py-12">
         <div className="max-w-md w-full mx-auto">
           <div className="flex items-center space-x-2 mb-16">
-            <div className="w-10 h-10 bg-brand-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-brand-100">
+            <div className="w-10 h-10 bg-white rounded-2xl flex items-center justify-center shadow-xl shadow-brand-100 border border-slate-200/70">
               <img src="/logo.png" alt="CRM" className="w-full h-full object-contain" />
             </div>
             <span className="text-xl font-black font-display tracking-tight">CRM</span>
@@ -215,7 +215,9 @@ const Register = () => {
 
         <div className="relative z-10 max-w-lg">
           <div className="inline-flex items-center px-4 py-2 bg-white/10 backdrop-blur-md border border-white/10 rounded-full text-white text-xs font-black uppercase tracking-widest mb-8">
-            <img src="/logo.png" alt="CRM" className="mr-2 h-4 w-4 object-contain" />
+            <span className="mr-2 inline-flex h-4 w-4 items-center justify-center rounded-md bg-white/95 p-0.5">
+              <img src="/logo.png" alt="CRM" className="h-full w-full object-contain" />
+            </span>
             Rejoignez 5,000+ entreprises
           </div>
 

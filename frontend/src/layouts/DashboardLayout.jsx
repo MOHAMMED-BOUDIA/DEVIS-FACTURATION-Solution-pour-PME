@@ -47,7 +47,7 @@ const DashboardLayout = () => {
       {/* Sidebar */}
       <aside className="hidden lg:flex flex-col w-72 bg-white border-r border-slate-200/60 p-6 z-20">
         <div className="flex items-center space-x-3 px-2 mb-10">
-          <div className="w-10 h-10 bg-gradient-to-tr from-primary-600 to-blue-400 rounded-xl shadow-lg shadow-primary-200 flex items-center justify-center text-white">
+          <div className="w-10 h-10 bg-white rounded-xl shadow-lg shadow-primary-200 flex items-center justify-center border border-slate-200/70">
             <img src="/logo.png" alt="CRM" className="w-full h-full object-contain" />
           </div>
           <span className="text-2xl font-bold tracking-tight font-heading bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-transparent">
@@ -141,8 +141,8 @@ const DashboardLayout = () => {
           <aside className="fixed inset-y-0 left-0 w-72 bg-white p-6 shadow-2xl animate-in slide-in-from-left duration-500">
             <div className="flex items-center justify-between mb-10">
               <div className="flex items-center space-x-2">
-                <div className="w-9 h-9 bg-primary-600 rounded-xl flex items-center justify-center text-white">
-                    <img src="/logo.png" alt="CRM" className="w-full h-full object-contain" />
+                <div className="w-9 h-9 bg-white rounded-xl flex items-center justify-center border border-slate-200/70">
+                  <img src="/logo.png" alt="CRM" className="w-full h-full object-contain" />
                 </div>
                 <span className="text-xl font-bold font-heading">CRM</span>
               </div>

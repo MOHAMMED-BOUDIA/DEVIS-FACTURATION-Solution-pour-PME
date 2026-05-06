@@ -127,7 +127,7 @@ export default function AppLayout() {
             <img src="/logo.png" alt="CRM" className="app-brand-logo" />
           </div>
           <div className="app-brand-text">
-            
+            <span className="app-brand-name"></span>
             <span className="app-brand-subtitle">Gestion PME</span>
           </div>
         </div>
