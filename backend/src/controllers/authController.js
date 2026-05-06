@@ -2,6 +2,8 @@ import User from '../models/User.js';
 import Company from '../models/Company.js';
 import asyncHandler from '../middleware/async.js';
 import ErrorResponse from '../utils/errorResponse.js';
+import crypto from 'crypto';
+import { sendVerificationEmail } from '../utils/emailService.js';
 
 const serializeUser = (user) => {
   const companyId = user?.company?._id || user?.company || null;
@@ -41,6 +43,7 @@ const buildAuthPayload = (user, token) => {
 // @access  Public
 export const register = asyncHandler(async (req, res, next) => {
   const { name, email, password, companyName, companyTaxId } = req.body;
+  const normalizedEmail = email.trim().toLowerCase();
 
   // Validation
   if (!name || !email || !password || !companyName || !companyTaxId) {
@@ -52,7 +55,7 @@ export const register = asyncHandler(async (req, res, next) => {
   }
 
   // Check if user already exists
-  const existingUser = await User.findOne({ email });
+  const existingUser = await User.findOne({ email: normalizedEmail });
   if (existingUser) {
     return next(new ErrorResponse('Email already registered', 409));
   }
@@ -60,20 +63,40 @@ export const register = asyncHandler(async (req, res, next) => {
   const company = await Company.create({
     name: companyName,
     taxId: companyTaxId,
-    email,
+    email: normalizedEmail,
   });
 
   // Create user - FORCE role to 'user' for security
   // Never trust 'role' from req.body
   const user = await User.create({
     name,
-    email,
+    email: normalizedEmail,
     password,
     company: company._id,
     role: 'user', 
   });
 
-  await sendTokenResponse(user, 201, res);
+  const verificationCode = user.getEmailVerificationCode();
+
+  await user.save({ validateBeforeSave: false });
+
+  try {
+    await sendVerificationEmail({
+      to: normalizedEmail,
+      name,
+      verificationCode,
+    });
+  } catch (emailError) {
+    await User.findByIdAndDelete(user._id);
+    await Company.findByIdAndDelete(company._id);
+    return next(new ErrorResponse('Unable to send verification email. Please try again.', 500));
+  }
+
+  res.status(201).json({
+    success: true,
+    message: 'Registration successful. Please verify your email address before logging in.',
+    verificationRequired: true,
+  });
 });
 
 // @desc    Login user
@@ -81,6 +104,7 @@ export const register = asyncHandler(async (req, res, next) => {
 // @access  Public
 export const login = asyncHandler(async (req, res, next) => {
   const { email, password, remember } = req.body;
+  const normalizedEmail = email.trim().toLowerCase();
 
   // Validate email & password
   if (!email || !password) {
@@ -88,7 +112,7 @@ export const login = asyncHandler(async (req, res, next) => {
   }
 
   // Check for user
-  const user = await User.findOne({ email }).select('+password');
+  const user = await User.findOne({ email: normalizedEmail }).select('+password');
 
   if (!user) {
     return res.status(401).json({
@@ -109,7 +133,50 @@ export const login = asyncHandler(async (req, res, next) => {
     });
   }
 
+  if (!user.isVerified) {
+    return res.status(403).json({
+      success: false,
+      error_code: 'EMAIL_NOT_VERIFIED',
+      message: 'Please verify your email address before logging in.',
+    });
+  }
+
   await sendTokenResponse(user, 200, res, remember);
+});
+
+// @desc    Verify user email
+// @route   POST /api/auth/verify-email
+// @access  Public
+export const verifyEmail = asyncHandler(async (req, res, next) => {
+  const verificationCode = String(req.body.code || '').trim();
+
+  if (!/^\d{6}$/.test(verificationCode)) {
+    return next(new ErrorResponse('Please provide a valid 6-digit verification code.', 400));
+  }
+
+  const hashedToken = crypto
+    .createHash('sha256')
+    .update(verificationCode)
+    .digest('hex');
+
+  const user = await User.findOne({
+    verifyEmailToken: hashedToken,
+    verifyEmailExpire: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    return next(new ErrorResponse('Verification code is invalid or has expired', 400));
+  }
+
+  user.isVerified = true;
+  user.verifyEmailToken = undefined;
+  user.verifyEmailExpire = undefined;
+  await user.save({ validateBeforeSave: false });
+
+  res.status(200).json({
+    success: true,
+    message: 'Email verified successfully. You can now log in.',
+  });
 });
 
 // @desc    Get current logged in user

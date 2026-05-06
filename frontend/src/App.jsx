@@ -9,6 +9,7 @@ import '@fontsource/inter';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import VerifyEmail from './pages/VerifyEmail';
 import Clients from './pages/Clients';
 import Products from './pages/Products';
 import Quotes from './pages/Quotes';
@@ -44,6 +45,7 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/verify-email" element={<VerifyEmail />} />
 
         {/* Protected Dashboard Routes */}
         <Route path="/" element={

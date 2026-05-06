@@ -1,10 +1,10 @@
 import React from 'react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Mail, Lock, User, Zap, ArrowRight, ShieldCheck, BarChart3, Clock, CheckCircle2, Building2, Hash } from 'lucide-react';
+import { Mail, Lock, User, ArrowRight, ShieldCheck, BarChart3, Clock, CheckCircle2, Building2, Hash } from 'lucide-react';
 import { Input, Button } from '../components/UI';
 import useAuthStore from '../store/authStore';
 
@@ -22,6 +22,7 @@ const registerSchema = z.object({
 const Register = () => {
   const { register: signup, loading, isAuthenticated, initialized } = useAuthStore();
   const navigate = useNavigate();
+  const [successMessage, setSuccessMessage] = useState('');
 
   useEffect(() => {
     if (initialized && isAuthenticated) {
@@ -42,7 +43,7 @@ const Register = () => {
     const result = await signup(data.name, data.email, data.password, data.companyName, data.companyTaxId);
 
     if (result.success) {
-      navigate('/dashboard', { replace: true });
+      setSuccessMessage(result.message || 'Votre compte a ete cree. Verifiez votre boite mail pour activer le compte.');
     } else {
       const errorMessage = result.error?.message || 'Une erreur est survenue';
 
@@ -60,9 +61,9 @@ const Register = () => {
         <div className="max-w-md w-full mx-auto">
           <div className="flex items-center space-x-2 mb-16">
             <div className="w-10 h-10 bg-brand-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-brand-100">
-              <Zap size={22} fill="white" />
+              <img src="/logo.png" alt="CRM" className="w-full h-full object-contain" />
             </div>
-            <span className="text-xl font-black font-display tracking-tight">ProFacture</span>
+            <span className="text-xl font-black font-display tracking-tight">CRM</span>
           </div>
 
           <h1 className="text-4xl font-black text-slate-900 mb-2 leading-tight tracking-tight">
@@ -72,86 +73,118 @@ const Register = () => {
             Creez votre compte en moins de 2 minutes.
           </p>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            {errors.root?.message && (
-              <div className="p-4 bg-red-50 border border-red-100 text-red-600 rounded-xl text-sm font-bold animate-shake">
-                {errors.root.message}
-              </div>
-            )}
-
-            <Input
-              label="Nom Complet"
-              placeholder="Ex: Jean Dupont"
-              icon={User}
-              error={errors.name?.message}
-              {...register('name')}
-            />
-
-            <Input
-              label="Adresse Email Professionnelle"
-              placeholder="nom@entreprise.com"
-              icon={Mail}
-              error={errors.email?.message}
-              {...register('email')}
-            />
-
-            <Input
-              label="Nom de l'entreprise"
-              placeholder="Ex: Atlas Consulting"
-              icon={Building2}
-              error={errors.companyName?.message}
-              {...register('companyName')}
-            />
-
-            <Input
-              label="Identifiant fiscal (ICE/IF)"
-              placeholder="Ex: 001234567000089"
-              icon={Hash}
-              error={errors.companyTaxId?.message}
-              {...register('companyTaxId')}
-            />
-
-            <Input
-              label="Mot de passe"
-              type="password"
-              placeholder="••••••••"
-              icon={Lock}
-              error={errors.password?.message}
-              {...register('password')}
-            />
-
-            <div className="space-y-3">
-              <div className="flex items-start">
-                <input
-                  type="checkbox"
-                  id="terms"
-                  className={`mt-1 w-5 h-5 rounded-lg border-slate-200 text-brand-600 focus:ring-brand-500/10 ${errors.terms ? 'border-red-500' : ''}`}
-                  {...register('terms')}
-                />
-                <label htmlFor="terms" className="ml-3 text-sm font-bold text-slate-600 cursor-pointer leading-tight">
-                  J'accepte les <Link to="#" className="text-brand-600 underline">Conditions Generales</Link> et la <Link to="#" className="text-brand-600 underline">Politique de Confidentialite</Link>
-                </label>
-              </div>
-              {errors.terms && <p className="text-[11px] font-bold text-red-500 uppercase tracking-wider">{errors.terms.message}</p>}
-            </div>
-
-            <Button type="submit" size="lg" className="w-full" disabled={loading}>
-              {loading ? (
-                <div className="flex items-center">
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Creation...
+          {successMessage ? (
+            <div className="mb-8 rounded-2xl border border-emerald-200 bg-emerald-50 p-6 text-emerald-800 shadow-sm">
+              <div className="flex items-start gap-4">
+                <div className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-600 text-white font-black">
+                  ✓
                 </div>
-              ) : (
-                <>
-                  Creer mon compte
-                  <ArrowRight size={18} className="ml-2" />
-                </>
+                <div>
+                  <h2 className="text-lg font-black text-emerald-900">Code de verification envoyé</h2>
+                  <p className="mt-2 text-sm font-medium leading-relaxed text-emerald-700">
+                    {successMessage}
+                  </p>
+                  <p className="mt-3 text-sm font-medium leading-relaxed text-emerald-700">
+                    Ouvrez votre boîte mail, récupérez le code à 6 chiffres, puis ouvrez l’écran de vérification.
+                    Vérifiez aussi le dossier spam si vous ne voyez rien.
+                  </p>
+                  <div className="mt-5 flex flex-wrap gap-3">
+                    <Link to="/verify-email" className="inline-flex items-center justify-center rounded-xl bg-emerald-600 px-5 py-3 text-sm font-black text-white transition-colors hover:bg-emerald-700">
+                      Entrer le code
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={() => setSuccessMessage('')}
+                      className="inline-flex items-center justify-center rounded-xl border border-emerald-300 bg-white px-5 py-3 text-sm font-black text-emerald-700 transition-colors hover:bg-emerald-100"
+                    >
+                      Modifier le formulaire
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+              {errors.root?.message && (
+                <div className="p-4 bg-red-50 border border-red-100 text-red-600 rounded-xl text-sm font-bold animate-shake">
+                  {errors.root.message}
+                </div>
               )}
-            </Button>
-          </form>
+
+              <Input
+                label="Nom Complet"
+                placeholder="Ex: Jean Dupont"
+                icon={User}
+                error={errors.name?.message}
+                {...register('name')}
+              />
+
+              <Input
+                label="Adresse Email Professionnelle"
+                placeholder="nom@entreprise.com"
+                icon={Mail}
+                error={errors.email?.message}
+                {...register('email')}
+              />
+
+              <Input
+                label="Nom de l'entreprise"
+                placeholder="Ex: Atlas Consulting"
+                icon={Building2}
+                error={errors.companyName?.message}
+                {...register('companyName')}
+              />
+
+              <Input
+                label="Identifiant fiscal (ICE/IF)"
+                placeholder="Ex: 001234567000089"
+                icon={Hash}
+                error={errors.companyTaxId?.message}
+                {...register('companyTaxId')}
+              />
+
+              <Input
+                label="Mot de passe"
+                type="password"
+                placeholder="••••••••"
+                icon={Lock}
+                error={errors.password?.message}
+                {...register('password')}
+              />
+
+              <div className="space-y-3">
+                <div className="flex items-start">
+                  <input
+                    type="checkbox"
+                    id="terms"
+                    className={`mt-1 w-5 h-5 rounded-lg border-slate-200 text-brand-600 focus:ring-brand-500/10 ${errors.terms ? 'border-red-500' : ''}`}
+                    {...register('terms')}
+                  />
+                  <label htmlFor="terms" className="ml-3 text-sm font-bold text-slate-600 cursor-pointer leading-tight">
+                    J'accepte les <Link to="#" className="text-brand-600 underline">Conditions Generales</Link> et la <Link to="#" className="text-brand-600 underline">Politique de Confidentialite</Link>
+                  </label>
+                </div>
+                {errors.terms && <p className="text-[11px] font-bold text-red-500 uppercase tracking-wider">{errors.terms.message}</p>}
+              </div>
+
+              <Button type="submit" size="lg" className="w-full" disabled={loading}>
+                {loading ? (
+                  <div className="flex items-center">
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Creation...
+                  </div>
+                ) : (
+                  <>
+                    Creer mon compte
+                    <ArrowRight size={18} className="ml-2" />
+                  </>
+                )}
+              </Button>
+            </form>
+          )}
 
           <p className="mt-10 text-center text-slate-500 font-medium text-sm">
             Deja inscrit ? <Link to="/login" className="text-brand-600 font-black hover:underline ml-1">Connectez-vous ici</Link>
@@ -182,7 +215,7 @@ const Register = () => {
 
         <div className="relative z-10 max-w-lg">
           <div className="inline-flex items-center px-4 py-2 bg-white/10 backdrop-blur-md border border-white/10 rounded-full text-white text-xs font-black uppercase tracking-widest mb-8">
-            <Zap size={14} className="mr-2 text-brand-400 fill-brand-400" />
+            <img src="/logo.png" alt="CRM" className="mr-2 h-4 w-4 object-contain" />
             Rejoignez 5,000+ entreprises
           </div>
 

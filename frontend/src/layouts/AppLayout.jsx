@@ -12,7 +12,6 @@ import {
   Shield,
   Users,
   X,
-  Zap,
 } from 'lucide-react';
 import useAuthStore from '../store/authStore';
 import api from '../api/client';
@@ -98,7 +97,7 @@ export default function AppLayout() {
 
   const pageTitle = useMemo(() => {
     const match = navItems.find((item) => location.pathname.startsWith(item.to));
-    return match?.label || 'ProFacture';
+    return match?.label || 'CRM';
   }, [location.pathname, navItems]);
 
   const resolvedCompanyId =
@@ -125,10 +124,10 @@ export default function AppLayout() {
       >
         <div className={`app-brand ${sidebarExpanded ? 'is-expanded' : 'is-collapsed'}`}>
           <div className="app-brand-mark">
-            <Zap size={18} />
+            <img src="/logo.png" alt="CRM" className="app-brand-logo" />
           </div>
           <div className="app-brand-text">
-            <span className="app-brand-name">ProFacture</span>
+            
             <span className="app-brand-subtitle">Gestion PME</span>
           </div>
         </div>
@@ -207,10 +206,10 @@ export default function AppLayout() {
             <div className="app-mobile-panel-header">
               <div className="app-brand is-expanded">
                 <div className="app-brand-mark">
-                  <Zap size={18} />
+                  <img src="/logo.png" alt="CRM" className="app-brand-logo" />
                 </div>
                 <div className="app-brand-text">
-                  <span className="app-brand-name">ProFacture</span>
+                  <span className="app-brand-name">CRM</span>
                   <span className="app-brand-subtitle">Gestion PME</span>
                 </div>
               </div>

@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Mail, Lock, Zap, ArrowRight, ShieldCheck, BarChart3 } from 'lucide-react';
+import { Mail, Lock, ArrowRight, ShieldCheck, BarChart3 } from 'lucide-react';
 import { Input, Button } from '../components/UI';
 import useAuthStore from '../store/authStore';
 
@@ -63,9 +63,9 @@ const Login = () => {
         <div className="max-w-md w-full mx-auto">
           <div className="flex items-center space-x-2 mb-16">
             <div className="w-10 h-10 bg-brand-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-brand-100">
-              <Zap size={22} fill="white" />
+              <img src="/logo.png" alt="CRM" className="w-full h-full object-contain" />
             </div>
-            <span className="text-xl font-black font-display tracking-tight">ProFacture</span>
+            <span className="text-xl font-black font-display tracking-tight">CRM</span>
           </div>
 
           <h1 className="text-4xl font-black text-slate-900 mb-2 leading-tight tracking-tight">

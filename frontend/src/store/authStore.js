@@ -143,10 +143,18 @@ const useAuthStore = create((set) => ({
       if (token) {
         persistToken(token, true);
         setAuthToken(token);
+        const user = normalizeAuthPayload(response.data);
+        set({ user, isAuthenticated: true, loading: false, initialized: true });
+      } else {
+        clearStoredToken();
+        setAuthToken(null);
+        set({ user: null, isAuthenticated: false, loading: false, initialized: true });
       }
-      const user = normalizeAuthPayload(response.data);
-      set({ user, isAuthenticated: true, loading: false, initialized: true });
-      return { success: true };
+      return {
+        success: true,
+        verificationRequired: response.data?.verificationRequired ?? !token,
+        message: response.data?.message || 'Registration successful.',
+      };
     } catch (error) {
       const apiError = {
         message: error.response?.data?.error || 'Registration failed',
