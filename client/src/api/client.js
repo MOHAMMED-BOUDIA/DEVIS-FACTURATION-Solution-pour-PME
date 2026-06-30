@@ -4,7 +4,7 @@ const AUTH_TOKEN_LOCAL_KEY = 'auth_token';
 const AUTH_TOKEN_SESSION_KEY = 'auth_token_session';
 
 const api = axios.create({
-  baseURL: `${(import.meta.env.VITE_API_URL || '').replace(/\/$/, '')}/api`,
+  baseURL: `${(import.meta.env.VITE_API_URL ).replace(/\/$/, '')}/api`,
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',

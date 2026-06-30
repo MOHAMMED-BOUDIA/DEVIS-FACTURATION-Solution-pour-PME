@@ -48,7 +48,7 @@ const DashboardLayout = () => {
       <aside className="hidden lg:flex flex-col w-72 bg-white border-r border-slate-200/60 p-6 z-20">
         <div className="flex items-center space-x-3 px-2 mb-10">
           <div className="w-10 h-10 bg-white rounded-xl shadow-lg shadow-primary-200 flex items-center justify-center border border-slate-200/70">
-            <img src="/logo.png" alt="CRM" className="w-full h-full object-contain" />
+            <img src="/devis.png" alt="CRM" className="w-full h-full object-contain" />
           </div>
           <span className="text-2xl font-bold tracking-tight font-heading bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-transparent">
             CRM
@@ -142,7 +142,7 @@ const DashboardLayout = () => {
             <div className="flex items-center justify-between mb-10">
               <div className="flex items-center space-x-2">
                 <div className="w-9 h-9 bg-white rounded-xl flex items-center justify-center border border-slate-200/70">
-                  <img src="/logo.png" alt="CRM" className="w-full h-full object-contain" />
+                  <img src="/devis.png" alt="CRM" className="w-full h-full object-contain" />
                 </div>
                 <span className="text-xl font-bold font-heading">CRM</span>
               </div>

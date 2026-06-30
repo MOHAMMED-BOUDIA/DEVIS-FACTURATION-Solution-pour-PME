@@ -1,10 +1,10 @@
 import React from 'react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Mail, Lock, ArrowRight, ShieldCheck, BarChart3 } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, ArrowRight, ShieldCheck, BarChart3 } from 'lucide-react';
 import { Input, Button } from '../components/UI';
 import useAuthStore from '../store/authStore';
 
@@ -15,6 +15,7 @@ const loginSchema = z.object({
 });
 
 const Login = () => {
+  const [showPassword, setShowPassword] = useState(false);
   const { login, loading, isAuthenticated, initialized } = useAuthStore();
   const navigate = useNavigate();
 
@@ -61,11 +62,13 @@ const Login = () => {
     <div className="min-h-screen flex bg-white">
       <div className="flex-1 flex flex-col justify-center px-8 md:px-20 lg:px-32 py-12">
         <div className="max-w-md w-full mx-auto">
-          <div className="flex items-center space-x-2 mb-16">
-            <div className="w-10 h-10 bg-white rounded-2xl flex items-center justify-center shadow-xl shadow-brand-100 border border-slate-200/70">
-              <img src="/logo.png" alt="CRM" className="w-full h-full object-contain" />
+          <div className="mb-16">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 rounded-2xl flex items-center justify-center shadow-xl shadow-brand-100 border border-slate-200/70 overflow-hidden bg-white">
+                <img src="/devis.png" alt="QuickDevis" className="w-full h-full object-contain" />
+              </div>
+              <span className="text-xl font-black font-display tracking-tight text-slate-900">QuickDevis</span>
             </div>
-            <span className="text-xl font-black font-display tracking-tight">CRM</span>
           </div>
 
           <h1 className="text-4xl font-black text-slate-900 mb-2 leading-tight tracking-tight">
@@ -94,13 +97,24 @@ const Login = () => {
               <div className="flex justify-between items-center mb-1">
                 <label className="label-modern">Mot de passe</label>
               </div>
-              <Input
-                type="password"
-                placeholder="••••••••"
-                icon={Lock}
-                error={errors.password?.message}
-                {...register('password')}
-              />
+              <div className="relative">
+                <Input
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="••••••••"
+                  icon={Lock}
+                  error={errors.password?.message}
+                  wrapperClassName="!space-y-0"
+                  {...register('password')}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
             </div>
 
             <div className="flex items-center">

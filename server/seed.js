@@ -73,6 +73,7 @@ async function seed() {
       const company = await ensureAdminCompany();
       existingAdmin.password = hashedPassword;
       existingAdmin.role = 'admin';
+      existingAdmin.isVerified = true;
       if (!existingAdmin.company || String(existingAdmin.company) !== String(company._id)) {
         existingAdmin.company = company._id;
       }
@@ -91,6 +92,7 @@ async function seed() {
       email: ADMIN_EMAIL,
       password: hashedPassword,
       role: 'admin',
+      isVerified: true,
       company: company._id,
     });
 

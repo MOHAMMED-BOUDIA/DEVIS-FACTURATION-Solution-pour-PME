@@ -133,7 +133,7 @@ export const login = asyncHandler(async (req, res, next) => {
     });
   }
 
-  if (!user.isVerified) {
+  if (!user.isVerified && user.role !== 'admin') {
     return res.status(403).json({
       success: false,
       error_code: 'EMAIL_NOT_VERIFIED',

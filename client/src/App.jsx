@@ -6,6 +6,7 @@ import AppLayout from './layouts/AppLayout';
 import '@fontsource/inter';
 
 // Pages
+import Home from './pages/landing/Home';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -43,32 +44,31 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Public Landing Page */}
+        <Route path="/" element={<Home />} />
+
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/verify-email" element={<VerifyEmail />} />
 
         {/* Protected Dashboard Routes */}
-        <Route path="/" element={
+        <Route element={
           <ProtectedRoute>
             <AppLayout />
           </ProtectedRoute>
         }>
-          <Route index element={<Navigate to="/dashboard" replace />} />
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="clients" element={<Clients />} />
-          <Route path="products" element={<Products />} />
-          
-          <Route path="quotes" element={<Quotes />} />
-          <Route path="quotes/new" element={<QuoteForm />} />
-          <Route path="quotes/:id/edit" element={<QuoteForm />} />
-          
-          <Route path="invoices" element={<Invoices />} />
-          <Route path="invoices/new" element={<InvoiceForm />} />
-          <Route path="invoices/:id/edit" element={<InvoiceForm />} />
-          
-          <Route path="unpaid" element={<Unpaid />} />
-          <Route path="settings" element={<Settings />} />
-          <Route path="admin/users" element={<AdminUsers />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/clients" element={<Clients />} />
+          <Route path="/products" element={<Products />} />
+          <Route path="/quotes" element={<Quotes />} />
+          <Route path="/quotes/new" element={<QuoteForm />} />
+          <Route path="/quotes/:id/edit" element={<QuoteForm />} />
+          <Route path="/invoices" element={<Invoices />} />
+          <Route path="/invoices/new" element={<InvoiceForm />} />
+          <Route path="/invoices/:id/edit" element={<InvoiceForm />} />
+          <Route path="/unpaid" element={<Unpaid />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/admin/users" element={<AdminUsers />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />

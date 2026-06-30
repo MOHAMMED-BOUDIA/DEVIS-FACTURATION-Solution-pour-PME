@@ -124,11 +124,11 @@ export default function AppLayout() {
       >
         <div className={`app-brand ${sidebarExpanded ? 'is-expanded' : 'is-collapsed'}`}>
           <div className="app-brand-mark">
-            <img src="/logo.png" alt="CRM" className="app-brand-logo" />
+            <img src="/devis.png" alt="CRM" className="app-brand-logo" />
           </div>
           <div className="app-brand-text">
             <span className="app-brand-name"></span>
-            <span className="app-brand-subtitle">Gestion PME</span>
+            <span className="app-brand-subtitle">QuickDevis</span>
           </div>
         </div>
 
@@ -206,11 +206,11 @@ export default function AppLayout() {
             <div className="app-mobile-panel-header">
               <div className="app-brand is-expanded">
                 <div className="app-brand-mark">
-                  <img src="/logo.png" alt="CRM" className="app-brand-logo" />
+                  <img src="/devis.png" alt="CRM" className="app-brand-logo" />
                 </div>
                 <div className="app-brand-text">
                   <span className="app-brand-name">CRM</span>
-                  <span className="app-brand-subtitle">Gestion PME</span>
+                  <span className="app-brand-subtitle">QuickDevis</span>
                 </div>
               </div>
               <button
